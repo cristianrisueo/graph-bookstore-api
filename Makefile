@@ -1,4 +1,4 @@
-.PHONY: db-up db-down migrate-up migrate-down seed generate run
+.PHONY: db-up db-down migrate-up migrate-down seed generate run setup reset
 
 # Levanta el contenedor de la base de datos en segundo plano
 db-up:
@@ -27,3 +27,11 @@ generate:
 # Arranca la API en local
 run:
 	go run .
+
+# Levanta la base de datos, aplica migraciones y carga datos de ejemplo
+setup: db-up migrate-up seed
+
+# Borra el volumen de la base de datos y vuelve a dejarlo todo listo
+reset:
+	docker compose down -v
+	$(MAKE) setup

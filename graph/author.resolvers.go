@@ -7,6 +7,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/cristianrisueo/graph-bookstore-api/store"
@@ -14,7 +15,7 @@ import (
 
 // Books is the resolver for the books field.
 func (r *authorResolver) Books(ctx context.Context, obj *store.Author) ([]*store.Book, error) {
-	panic(fmt.Errorf("not implemented: Books - books"))
+	return r.Store.ListBooksByAuthor(ctx, obj.ID)
 }
 
 // CreateAuthor is the resolver for the createAuthor field.
@@ -34,12 +35,16 @@ func (r *mutationResolver) DeleteAuthor(ctx context.Context, id int) (bool, erro
 
 // Authors is the resolver for the authors field.
 func (r *queryResolver) Authors(ctx context.Context) ([]*store.Author, error) {
-	panic(fmt.Errorf("not implemented: Authors - authors"))
+	return r.Store.ListAuthors(ctx)
 }
 
 // Author is the resolver for the author field.
 func (r *queryResolver) Author(ctx context.Context, id int) (*store.Author, error) {
-	panic(fmt.Errorf("not implemented: Author - author"))
+	author, err := r.Store.GetAuthor(ctx, id)
+	if errors.Is(err, store.ErrAuthorNotFound) {
+		return nil, nil
+	}
+	return author, err
 }
 
 // AuthorCreated is the resolver for the authorCreated field.
