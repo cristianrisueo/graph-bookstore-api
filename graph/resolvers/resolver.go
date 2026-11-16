@@ -1,4 +1,4 @@
-package graph
+package resolvers
 
 import "github.com/cristianrisueo/graph-bookstore-api/store"
 

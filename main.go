@@ -16,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 
 	"github.com/cristianrisueo/graph-bookstore-api/graph"
+	"github.com/cristianrisueo/graph-bookstore-api/graph/resolvers"
 	"github.com/cristianrisueo/graph-bookstore-api/store"
 )
 
@@ -36,7 +37,7 @@ func main() {
 	defer st.Close()
 
 	// Servidor GraphQL con transportes POST y GET e introspección.
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Store: st}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &resolvers.Resolver{Store: st}}))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.GET{})
 	srv.Use(extension.Introspection{})

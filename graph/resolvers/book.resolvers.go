@@ -1,4 +1,4 @@
-package graph
+package resolvers
 
 // This file will be automatically regenerated based on the schema, any resolver
 // implementations
@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cristianrisueo/graph-bookstore-api/graph/model"
+	"github.com/cristianrisueo/graph-bookstore-api/graph"
 	"github.com/cristianrisueo/graph-bookstore-api/store"
 )
 
@@ -20,12 +20,12 @@ func (r *bookResolver) Author(ctx context.Context, obj *store.Book) (*store.Auth
 }
 
 // CreateBook is the resolver for the createBook field.
-func (r *mutationResolver) CreateBook(ctx context.Context, input model.BookToCreate) (*store.Book, error) {
+func (r *mutationResolver) CreateBook(ctx context.Context, input graph.BookToCreate) (*store.Book, error) {
 	panic(fmt.Errorf("not implemented: CreateBook - createBook"))
 }
 
 // UpdateBook is the resolver for the updateBook field.
-func (r *mutationResolver) UpdateBook(ctx context.Context, id int, input model.BookToUpdate) (*store.Book, error) {
+func (r *mutationResolver) UpdateBook(ctx context.Context, id int, input graph.BookToUpdate) (*store.Book, error) {
 	panic(fmt.Errorf("not implemented: UpdateBook - updateBook"))
 }
 
@@ -63,7 +63,7 @@ func (r *subscriptionResolver) BookDeleted(ctx context.Context) (<-chan int, err
 	panic(fmt.Errorf("not implemented: BookDeleted - bookDeleted"))
 }
 
-// Book returns BookResolver implementation.
-func (r *Resolver) Book() BookResolver { return &bookResolver{r} }
+// Book returns graph.BookResolver implementation.
+func (r *Resolver) Book() graph.BookResolver { return &bookResolver{r} }
 
 type bookResolver struct{ *Resolver }

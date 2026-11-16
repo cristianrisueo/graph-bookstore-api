@@ -1,4 +1,4 @@
-package graph
+package resolvers
 
 // This file will be automatically regenerated based on the schema, any resolver
 // implementations
@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cristianrisueo/graph-bookstore-api/graph"
 	"github.com/cristianrisueo/graph-bookstore-api/store"
 )
 
@@ -62,17 +63,17 @@ func (r *subscriptionResolver) AuthorDeleted(ctx context.Context) (<-chan int, e
 	panic(fmt.Errorf("not implemented: AuthorDeleted - authorDeleted"))
 }
 
-// Author returns AuthorResolver implementation.
-func (r *Resolver) Author() AuthorResolver { return &authorResolver{r} }
+// Author returns graph.AuthorResolver implementation.
+func (r *Resolver) Author() graph.AuthorResolver { return &authorResolver{r} }
 
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+// Mutation returns graph.MutationResolver implementation.
+func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+// Query returns graph.QueryResolver implementation.
+func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
-// Subscription returns SubscriptionResolver implementation.
-func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
+// Subscription returns graph.SubscriptionResolver implementation.
+func (r *Resolver) Subscription() graph.SubscriptionResolver { return &subscriptionResolver{r} }
 
 type (
 	authorResolver       struct{ *Resolver }

@@ -14,7 +14,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/cristianrisueo/graph-bookstore-api/graph/model"
 	"github.com/cristianrisueo/graph-bookstore-api/store"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -56,11 +55,11 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateAuthor func(childComplexity int, name string) int
-		CreateBook   func(childComplexity int, input model.BookToCreate) int
+		CreateBook   func(childComplexity int, input BookToCreate) int
 		DeleteAuthor func(childComplexity int, id int) int
 		DeleteBook   func(childComplexity int, id int) int
 		UpdateAuthor func(childComplexity int, id int, name string) int
-		UpdateBook   func(childComplexity int, id int, input model.BookToUpdate) int
+		UpdateBook   func(childComplexity int, id int, input BookToUpdate) int
 	}
 
 	Query struct {
@@ -94,8 +93,8 @@ type MutationResolver interface {
 	CreateAuthor(ctx context.Context, name string) (*store.Author, error)
 	UpdateAuthor(ctx context.Context, id int, name string) (*store.Author, error)
 	DeleteAuthor(ctx context.Context, id int) (bool, error)
-	CreateBook(ctx context.Context, input model.BookToCreate) (*store.Book, error)
-	UpdateBook(ctx context.Context, id int, input model.BookToUpdate) (*store.Book, error)
+	CreateBook(ctx context.Context, input BookToCreate) (*store.Book, error)
+	UpdateBook(ctx context.Context, id int, input BookToUpdate) (*store.Book, error)
 	DeleteBook(ctx context.Context, id int) (bool, error)
 }
 type QueryResolver interface {
@@ -196,7 +195,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CreateBook(childComplexity, args["input"].(model.BookToCreate)), true
+		return e.ComplexityRoot.Mutation.CreateBook(childComplexity, args["input"].(BookToCreate)), true
 	case "Mutation.deleteAuthor":
 		if e.ComplexityRoot.Mutation.DeleteAuthor == nil {
 			break
@@ -240,7 +239,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.UpdateBook(childComplexity, args["id"].(int), args["input"].(model.BookToUpdate)), true
+		return e.ComplexityRoot.Mutation.UpdateBook(childComplexity, args["id"].(int), args["input"].(BookToUpdate)), true
 
 	case "Query.author":
 		if e.ComplexityRoot.Query.Author == nil {
@@ -417,7 +416,7 @@ func newExecutionContext(
 	}
 }
 
-//go:embed "author.graphqls" "book.graphqls"
+//go:embed "schemas/author.graphqls" "schemas/book.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -429,8 +428,8 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
-	{Name: "author.graphqls", Input: sourceData("author.graphqls"), BuiltIn: false},
-	{Name: "book.graphqls", Input: sourceData("book.graphqls"), BuiltIn: false},
+	{Name: "schemas/author.graphqls", Input: sourceData("schemas/author.graphqls"), BuiltIn: false},
+	{Name: "schemas/book.graphqls", Input: sourceData("schemas/book.graphqls"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -598,8 +597,8 @@ func (ec *executionContext) field_Mutation_createBook_args(ctx context.Context, 
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
-		func(ctx context.Context, v any) (model.BookToCreate, error) {
-			return ec.unmarshalNBookToCreate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚋmodelᚐBookToCreate(ctx, v)
+		func(ctx context.Context, v any) (BookToCreate, error) {
+			return ec.unmarshalNBookToCreate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚐBookToCreate(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -670,8 +669,8 @@ func (ec *executionContext) field_Mutation_updateBook_args(ctx context.Context, 
 	}
 	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input",
-		func(ctx context.Context, v any) (model.BookToUpdate, error) {
-			return ec.unmarshalNBookToUpdate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚋmodelᚐBookToUpdate(ctx, v)
+		func(ctx context.Context, v any) (BookToUpdate, error) {
+			return ec.unmarshalNBookToUpdate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚐBookToUpdate(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -1117,7 +1116,7 @@ func (ec *executionContext) _Mutation_createBook(ctx context.Context, field grap
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateBook(ctx, fc.Args["input"].(model.BookToCreate))
+			return ec.Resolvers.Mutation().CreateBook(ctx, fc.Args["input"].(BookToCreate))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *store.Book) graphql.Marshaler {
@@ -1161,7 +1160,7 @@ func (ec *executionContext) _Mutation_updateBook(ctx context.Context, field grap
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().UpdateBook(ctx, fc.Args["id"].(int), fc.Args["input"].(model.BookToUpdate))
+			return ec.Resolvers.Mutation().UpdateBook(ctx, fc.Args["id"].(int), fc.Args["input"].(BookToUpdate))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *store.Book) graphql.Marshaler {
@@ -2714,8 +2713,8 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputBookToCreate(ctx context.Context, obj any) (model.BookToCreate, error) {
-	var it model.BookToCreate
+func (ec *executionContext) unmarshalInputBookToCreate(ctx context.Context, obj any) (BookToCreate, error) {
+	var it BookToCreate
 	if obj == nil {
 		return it, nil
 	}
@@ -2764,14 +2763,14 @@ func (ec *executionContext) unmarshalInputBookToCreate(ctx context.Context, obj 
 //
 // ctx must come from a gqlgen request; outside one there is no unmarshaler to use
 // and the returned error says so.
-func UnmarshalBookToCreate(ctx context.Context, raw any) (model.BookToCreate, error) {
-	var out model.BookToCreate
+func UnmarshalBookToCreate(ctx context.Context, raw any) (BookToCreate, error) {
+	var out BookToCreate
 	err := graphql.UnmarshalNamedInputFromContext(ctx, "BookToCreate", raw, &out)
 	return out, err
 }
 
-func (ec *executionContext) unmarshalInputBookToUpdate(ctx context.Context, obj any) (model.BookToUpdate, error) {
-	var it model.BookToUpdate
+func (ec *executionContext) unmarshalInputBookToUpdate(ctx context.Context, obj any) (BookToUpdate, error) {
+	var it BookToUpdate
 	if obj == nil {
 		return it, nil
 	}
@@ -2820,8 +2819,8 @@ func (ec *executionContext) unmarshalInputBookToUpdate(ctx context.Context, obj 
 //
 // ctx must come from a gqlgen request; outside one there is no unmarshaler to use
 // and the returned error says so.
-func UnmarshalBookToUpdate(ctx context.Context, raw any) (model.BookToUpdate, error) {
-	var out model.BookToUpdate
+func UnmarshalBookToUpdate(ctx context.Context, raw any) (BookToUpdate, error) {
+	var out BookToUpdate
 	err := graphql.UnmarshalNamedInputFromContext(ctx, "BookToUpdate", raw, &out)
 	return out, err
 }
@@ -3519,12 +3518,12 @@ func (ec *executionContext) marshalNBook2ᚖgithubᚗcomᚋcristianrisueoᚋgrap
 	return ec._Book(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNBookToCreate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚋmodelᚐBookToCreate(ctx context.Context, v any) (model.BookToCreate, error) {
+func (ec *executionContext) unmarshalNBookToCreate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚐBookToCreate(ctx context.Context, v any) (BookToCreate, error) {
 	res, err := ec.unmarshalInputBookToCreate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNBookToUpdate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚋmodelᚐBookToUpdate(ctx context.Context, v any) (model.BookToUpdate, error) {
+func (ec *executionContext) unmarshalNBookToUpdate2githubᚗcomᚋcristianrisueoᚋgraphᚑbookstoreᚑapiᚋgraphᚐBookToUpdate(ctx context.Context, v any) (BookToUpdate, error) {
 	res, err := ec.unmarshalInputBookToUpdate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }

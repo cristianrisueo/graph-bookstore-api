@@ -1,6 +1,6 @@
 # ¿Dónde están los archivos del esquema? Se admiten globs, p. ej. src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/schemas/*.graphqls
 
 # ¿Dónde se genera el código del servidor?
 exec:
@@ -32,22 +32,22 @@ exec:
 
 # ¿Dónde se generan los modelos?
 model:
-  filename: graph/model/models_gen.go
-  package: model
+  filename: graph/models_gen.go
+  package: graph
 
   # Opcional: ruta a una plantilla gotpl propia para generar los modelos
   # model_template: [your/path/model.gotpl]
 
 # ¿Dónde van las implementaciones de los resolvers?
 resolver:
-  package: graph
+  package: resolvers
   layout: follow-schema # La otra opción es "single-file".
 
   # Solo para el layout single-file:
   # filename: graph/resolver.go
 
   # Solo para el layout follow-schema:
-  dir: graph
+  dir: graph/resolvers
   filename_template: "{name}.resolvers.go"
 
   # Opcional: actívalo para no generar los comentarios de plantilla encima de los resolvers
