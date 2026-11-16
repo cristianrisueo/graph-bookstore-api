@@ -1,0 +1,27 @@
+# Tipo (modelo) de autor para la API GraphQL.
+type Author {
+  id: ID!
+  name: String!
+  books: [Book!]!
+}
+
+# Consulta de autores por ID o lista completa.
+type Query {
+  authors: [Author!]!
+  author(id: ID!): Author
+}
+
+# Mutaciones para crear, actualizar y eliminar autores.
+type Mutation {
+  createAuthor(name: String!): Author!
+  updateAuthor(id: ID!, name: String!): Author!
+  deleteAuthor(id: ID!): Boolean!
+}
+
+# Eventos de suscripción para notificar a los clientes sobre cambios en autores.
+# Se notifica en tiempo real (por dentro usa wss o SSE)
+type Subscription {
+  authorCreated: Author!
+  authorUpdated: Author!
+  authorDeleted: ID!
+}

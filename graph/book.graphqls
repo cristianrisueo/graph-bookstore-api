@@ -1,0 +1,40 @@
+# Tipo (modelo) de libro para la API GraphQL.
+type Book {
+  id: ID!
+  title: String!
+  year: Int!
+  author: Author!
+}
+
+# Tipos de entrada para crear y actualizar libros.
+input BookToCreate {
+  title: String!
+  year: Int!
+  authorId: ID!
+}
+
+input BookToUpdate {
+  title: String
+  year: Int
+  authorId: ID
+}
+
+# Consulta de libros por ID o lista completa.
+extend type Query {
+  books: [Book!]!
+  book(id: ID!): Book
+}
+
+# Mutaciones para crear, actualizar y eliminar libros.
+extend type Mutation {
+  createBook(input: BookToCreate!): Book!
+  updateBook(id: ID!, input: BookToUpdate!): Book!
+  deleteBook(id: ID!): Boolean!
+}
+
+# Eventos de suscripción para notificar a los clientes sobre cambios en libros.
+extend type Subscription {
+  bookCreated: Book!
+  bookUpdated: Book!
+  bookDeleted: ID!
+}

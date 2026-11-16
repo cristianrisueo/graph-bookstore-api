@@ -1,0 +1,16 @@
+# OS / editores
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Entorno
+.env
+.env.*
+
+# Go
+/bin/
+*.exe
+*.test
+*.out
+coverage.*
