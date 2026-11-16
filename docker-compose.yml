@@ -18,7 +18,7 @@ services:
   migrate:
     image: migrate/migrate:v4.20.1
     volumes:
-      - ./migrations:/migrations:ro
+      - ./db/migrations:/migrations:ro
     command:
       - "-path=/migrations"
       - "-database=postgres://bookstore:bookstore@db:5432/bookstore?sslmode=disable"

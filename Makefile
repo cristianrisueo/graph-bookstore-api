@@ -1,4 +1,4 @@
-.PHONY: db-up db-down migrate-up migrate-down generate run
+.PHONY: db-up db-down migrate-up migrate-down seed generate run
 
 # Levanta el contenedor de la base de datos en segundo plano
 db-up:
@@ -15,6 +15,10 @@ migrate-up:
 # Revierte todas las migraciones aplicadas
 migrate-down:
 	docker compose run --rm migrate -path=/migrations -database=postgres://bookstore:bookstore@db:5432/bookstore?sslmode=disable down -all
+
+# Carga datos de ejemplo en la base de datos
+seed:
+	docker compose exec -T db psql -U bookstore -d bookstore < db/seed.sql
 
 # Genera el código Go a partir de los esquemas GraphQL (gqlgen)
 generate:
