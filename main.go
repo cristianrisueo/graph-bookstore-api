@@ -41,6 +41,8 @@ func main() {
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.GET{})
 	srv.Use(extension.Introspection{})
+	srv.SetErrorPresenter(resolvers.NewErrorPresenter(logger))
+	srv.SetRecoverFunc(resolvers.NewRecoverFunc(logger))
 
 	// Rutas: endpoint GraphQL, playground y health check.
 	mux := http.NewServeMux()
