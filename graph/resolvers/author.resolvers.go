@@ -21,17 +21,31 @@ func (r *authorResolver) Books(ctx context.Context, obj *store.Author) ([]*store
 
 // CreateAuthor is the resolver for the createAuthor field.
 func (r *mutationResolver) CreateAuthor(ctx context.Context, name string) (*store.Author, error) {
-	panic(fmt.Errorf("not implemented: CreateAuthor - createAuthor"))
+	name, err := validateAuthorName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Store.CreateAuthor(ctx, name)
 }
 
 // UpdateAuthor is the resolver for the updateAuthor field.
 func (r *mutationResolver) UpdateAuthor(ctx context.Context, id int, name string) (*store.Author, error) {
-	panic(fmt.Errorf("not implemented: UpdateAuthor - updateAuthor"))
+	name, err := validateAuthorName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Store.UpdateAuthor(ctx, id, name)
 }
 
 // DeleteAuthor is the resolver for the deleteAuthor field.
 func (r *mutationResolver) DeleteAuthor(ctx context.Context, id int) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteAuthor - deleteAuthor"))
+	if err := r.Store.DeleteAuthor(ctx, id); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // Authors is the resolver for the authors field.
