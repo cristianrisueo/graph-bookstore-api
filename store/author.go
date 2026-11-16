@@ -21,14 +21,23 @@ var (
 	ErrAuthorHasBooks = errors.New("author has books")
 )
 
-// Códigos de error de Postgres para violaciones de clave foránea. Desde
-// Postgres 18, ON DELETE RESTRICT lanza 23001 (restrict_violation); antes de
-// esa versión, y también con ON DELETE NO ACTION o en inserciones, lanza
-// 23503 (foreign_key_violation).
-const (
-	pgRestrictViolation   = "23001"
-	pgForeignKeyViolation = "23503"
-)
+// CreateAuthor crea un autor con el nombre indicado y lo devuelve.
+func (s *Store) CreateAuthor(ctx context.Context, name string) (*Author, error) {
+	// Ejecuta el insert y obtiene la fila creada.
+	var a Author
+	err := s.db.QueryRowContext(ctx, `
+		INSERT INTO authors (name)
+		VALUES ($1)
+		RETURNING id, name
+	`, name).Scan(&a.ID, &a.Name)
+
+	if err != nil {
+		return nil, fmt.Errorf("create author: %w", err)
+	}
+
+	// Devuelve el autor creado.
+	return &a, nil
+}
 
 // ListAuthors devuelve todos los autores ordenados por id.
 func (s *Store) ListAuthors(ctx context.Context) ([]*Author, error) {
@@ -81,24 +90,6 @@ func (s *Store) GetAuthor(ctx context.Context, id int) (*Author, error) {
 	}
 
 	// Devuelve el autor.
-	return &a, nil
-}
-
-// CreateAuthor crea un autor con el nombre indicado y lo devuelve.
-func (s *Store) CreateAuthor(ctx context.Context, name string) (*Author, error) {
-	// Ejecuta el insert y obtiene la fila creada.
-	var a Author
-	err := s.db.QueryRowContext(ctx, `
-		INSERT INTO authors (name)
-		VALUES ($1)
-		RETURNING id, name
-	`, name).Scan(&a.ID, &a.Name)
-
-	if err != nil {
-		return nil, fmt.Errorf("create author: %w", err)
-	}
-
-	// Devuelve el autor creado.
 	return &a, nil
 }
 

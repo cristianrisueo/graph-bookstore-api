@@ -14,6 +14,15 @@ type Store struct {
 	db *sql.DB
 }
 
+// Códigos de error de Postgres para violaciones de clave foránea. Desde
+// Postgres 18, ON DELETE RESTRICT lanza 23001 (restrict_violation); antes de
+// esa versión, y también con ON DELETE NO ACTION o en inserciones, lanza
+// 23503 (foreign_key_violation).
+const (
+	pgRestrictViolation   = "23001"
+	pgForeignKeyViolation = "23503"
+)
+
 // New abre un pool de conexiones a PostgreSQL y lo verifica con un ping.
 func New(dsn string) (*Store, error) {
 	// Abre el pool (todavía no se establece ninguna conexión).

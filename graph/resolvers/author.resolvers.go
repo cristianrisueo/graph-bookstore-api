@@ -14,10 +14,7 @@ import (
 	"github.com/cristianrisueo/graph-bookstore-api/store"
 )
 
-// Books is the resolver for the books field.
-func (r *authorResolver) Books(ctx context.Context, obj *store.Author) ([]*store.Book, error) {
-	return r.Store.ListBooksByAuthor(ctx, obj.ID)
-}
+//* Resolvers para el CRUD: Queries y mutaciones
 
 // CreateAuthor is the resolver for the createAuthor field.
 func (r *mutationResolver) CreateAuthor(ctx context.Context, name string) (*store.Author, error) {
@@ -27,6 +24,25 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, name string) (*stor
 	}
 
 	return r.Store.CreateAuthor(ctx, name)
+}
+
+// Author is the resolver for the author field.
+func (r *queryResolver) Author(ctx context.Context, id int) (*store.Author, error) {
+	author, err := r.Store.GetAuthor(ctx, id)
+	if errors.Is(err, store.ErrAuthorNotFound) {
+		return nil, nil
+	}
+	return author, err
+}
+
+// Authors is the resolver for the authors field.
+func (r *queryResolver) Authors(ctx context.Context) ([]*store.Author, error) {
+	return r.Store.ListAuthors(ctx)
+}
+
+// Books is the resolver for the books field.
+func (r *authorResolver) Books(ctx context.Context, obj *store.Author) ([]*store.Book, error) {
+	return r.Store.ListBooksByAuthor(ctx, obj.ID)
 }
 
 // UpdateAuthor is the resolver for the updateAuthor field.
@@ -48,19 +64,7 @@ func (r *mutationResolver) DeleteAuthor(ctx context.Context, id int) (bool, erro
 	return true, nil
 }
 
-// Authors is the resolver for the authors field.
-func (r *queryResolver) Authors(ctx context.Context) ([]*store.Author, error) {
-	return r.Store.ListAuthors(ctx)
-}
-
-// Author is the resolver for the author field.
-func (r *queryResolver) Author(ctx context.Context, id int) (*store.Author, error) {
-	author, err := r.Store.GetAuthor(ctx, id)
-	if errors.Is(err, store.ErrAuthorNotFound) {
-		return nil, nil
-	}
-	return author, err
-}
+//* Resolvers para los eventos: Subscriptions
 
 // AuthorCreated is the resolver for the authorCreated field.
 func (r *subscriptionResolver) AuthorCreated(ctx context.Context) (<-chan *store.Author, error) {

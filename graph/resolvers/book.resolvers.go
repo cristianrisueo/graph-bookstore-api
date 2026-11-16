@@ -14,24 +14,23 @@ import (
 	"github.com/cristianrisueo/graph-bookstore-api/store"
 )
 
-// Author is the resolver for the author field.
-func (r *bookResolver) Author(ctx context.Context, obj *store.Book) (*store.Author, error) {
-	return r.Store.GetAuthor(ctx, obj.AuthorID)
-}
+//* Resolvers para el CRUD: Queries y mutaciones
 
 // CreateBook is the resolver for the createBook field.
 func (r *mutationResolver) CreateBook(ctx context.Context, input graph.BookToCreate) (*store.Book, error) {
-	panic(fmt.Errorf("not implemented: CreateBook - createBook"))
-}
+	title, err := validateBookTitle(input.Title)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateBookYear(input.Year); err != nil {
+		return nil, err
+	}
 
-// UpdateBook is the resolver for the updateBook field.
-func (r *mutationResolver) UpdateBook(ctx context.Context, id int, input graph.BookToUpdate) (*store.Book, error) {
-	panic(fmt.Errorf("not implemented: UpdateBook - updateBook"))
-}
-
-// DeleteBook is the resolver for the deleteBook field.
-func (r *mutationResolver) DeleteBook(ctx context.Context, id int) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteBook - deleteBook"))
+	book, err := r.Store.CreateBook(ctx, title, input.Year, input.AuthorID)
+	if errors.Is(err, store.ErrAuthorNotFound) {
+		return nil, inputError("authorId", "author does not exist")
+	}
+	return book, err
 }
 
 // Books is the resolver for the books field.
@@ -47,6 +46,68 @@ func (r *queryResolver) Book(ctx context.Context, id int) (*store.Book, error) {
 	}
 	return book, err
 }
+
+// Author is the resolver for the author field.
+func (r *bookResolver) Author(ctx context.Context, obj *store.Book) (*store.Author, error) {
+	return r.Store.GetAuthor(ctx, obj.AuthorID)
+}
+
+// UpdateBook is the resolver for the updateBook field.
+func (r *mutationResolver) UpdateBook(ctx context.Context, id int, input graph.BookToUpdate) (*store.Book, error) {
+	var u store.BookUpdate
+
+	if input.Title.IsSet() {
+		title := input.Title.Value()
+		if title == nil {
+			return nil, inputError("title", "title cannot be null")
+		}
+		validated, err := validateBookTitle(*title)
+		if err != nil {
+			return nil, err
+		}
+		u.Title = &validated
+	}
+
+	if input.Year.IsSet() {
+		year := input.Year.Value()
+		if year == nil {
+			return nil, inputError("year", "year cannot be null")
+		}
+		if err := validateBookYear(*year); err != nil {
+			return nil, err
+		}
+		u.Year = year
+	}
+
+	if input.AuthorID.IsSet() {
+		authorID := input.AuthorID.Value()
+		if authorID == nil {
+			return nil, inputError("authorId", "authorId cannot be null")
+		}
+		u.AuthorID = authorID
+	}
+
+	if !input.Title.IsSet() && !input.Year.IsSet() && !input.AuthorID.IsSet() {
+		return r.Store.GetBook(ctx, id)
+	}
+
+	book, err := r.Store.UpdateBook(ctx, id, u)
+	if errors.Is(err, store.ErrAuthorNotFound) {
+		return nil, inputError("authorId", "author does not exist")
+	}
+	return book, err
+}
+
+// DeleteBook is the resolver for the deleteBook field.
+func (r *mutationResolver) DeleteBook(ctx context.Context, id int) (bool, error) {
+	if err := r.Store.DeleteBook(ctx, id); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+//* Resolvers para los eventos: Subscriptions
 
 // BookCreated is the resolver for the bookCreated field.
 func (r *subscriptionResolver) BookCreated(ctx context.Context) (<-chan *store.Book, error) {

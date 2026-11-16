@@ -2793,21 +2793,21 @@ func (ec *executionContext) unmarshalInputBookToUpdate(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-			it.Title = data
+			it.Title = graphql.OmittableOf(data)
 		case "year":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Year = data
+			it.Year = graphql.OmittableOf(data)
 		case "authorId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorId"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.AuthorID = data
+			it.AuthorID = graphql.OmittableOf(data)
 		}
 	}
 	return it, nil

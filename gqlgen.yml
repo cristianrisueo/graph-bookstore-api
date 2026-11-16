@@ -118,7 +118,7 @@ resolver:
 # return_pointers_in_unmarshalinput: false
 
 # Opcional: envuelve los campos de entrada anulables con Omittable
-# nullable_input_omittable: true
+nullable_input_omittable: true
 
 # Opcional: añade omitempty a la etiqueta json de los campos de los modelos generados
 # enable_model_json_omitempty_tag: false

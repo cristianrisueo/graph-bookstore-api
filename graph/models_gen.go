@@ -2,6 +2,10 @@
 
 package graph
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type BookToCreate struct {
 	Title    string `json:"title"`
 	Year     int    `json:"year"`
@@ -9,9 +13,9 @@ type BookToCreate struct {
 }
 
 type BookToUpdate struct {
-	Title    *string `json:"title,omitempty"`
-	Year     *int    `json:"year,omitempty"`
-	AuthorID *int    `json:"authorId,omitempty"`
+	Title    graphql.Omittable[*string] `json:"title,omitempty"`
+	Year     graphql.Omittable[*int]    `json:"year,omitempty"`
+	AuthorID graphql.Omittable[*int]    `json:"authorId,omitempty"`
 }
 
 type Mutation struct {
