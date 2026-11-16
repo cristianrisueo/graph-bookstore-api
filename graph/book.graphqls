@@ -1,4 +1,4 @@
-# Tipo (modelo) de libro para la API GraphQL.
+# Modelo de libro para la API GraphQL.
 type Book {
   id: ID!
   title: String!

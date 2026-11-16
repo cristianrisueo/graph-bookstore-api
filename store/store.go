@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	// Registra el driver "pgx" para database/sql.
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -32,6 +31,7 @@ func New(dsn string) (*Store, error) {
 	// Comprueba que la base de datos es accesible.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	if err := db.PingContext(ctx); err != nil {
 		db.Close()
 		return nil, fmt.Errorf("ping database: %w", err)
