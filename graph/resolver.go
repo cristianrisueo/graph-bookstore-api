@@ -2,10 +2,10 @@ package graph
 
 import "github.com/cristianrisueo/graph-bookstore-api/store"
 
-// This file will not be regenerated automatically.
+// Este archivo no se regenera automáticamente.
 //
-// It serves as dependency injection for your app, add any dependencies you require
-// here.
+// Sirve como inyección de dependencias de la aplicación: añade aquí las
+// dependencias que necesiten los resolvers.
 
 type Resolver struct {
 	Store *store.Store

@@ -1,192 +1,192 @@
-# Where are all the schema files located? globs are supported eg  src/**/*.graphqls
+# ¿Dónde están los archivos del esquema? Se admiten globs, p. ej. src/**/*.graphqls
 schema:
   - graph/*.graphqls
 
-# Where should the generated server code go?
+# ¿Dónde se genera el código del servidor?
 exec:
   package: graph
-  layout: single-file # Only other option is "follow-schema," ie multi-file.
+  layout: single-file # La otra opción es "follow-schema", es decir, varios archivos.
 
-  # Only for single-file layout:
+  # Solo para el layout single-file:
   filename: graph/generated.go
 
-  # Only for follow-schema layout:
+  # Solo para el layout follow-schema:
   # dir: graph
   # filename_template: "{name}.generated.go"
 
-  # Optional: Maximum number of goroutines in concurrency to use per child resolvers(default: unlimited)
+  # Opcional: número máximo de goroutines concurrentes por resolver hijo (por defecto: ilimitado)
   # worker_limit: 1000
 
-# Uncomment to enable federation
+# Descomenta para activar la federación
 # federation:
 #   filename: graph/federation.go
 #   package: graph
 #   version: 2
 #   options:
-#     # Generate a function to populate @requires fields (cannot be used with computed_requires)
+#     # Genera una función para rellenar los campos @requires (no se puede usar con computed_requires)
 #     explicit_requires: false
-#     # Generate resolver functions to compute @requires field values (requires version 2 and call_argument_directives_with_null: true)
+#     # Genera resolvers para calcular los valores de los campos @requires (requiere version 2 y call_argument_directives_with_null: true)
 #     computed_requires: false
-#     # Default engine for entityResolver generation, can be overridden per entity with @entityResolver(multi: Boolean)
+#     # Motor por defecto para generar entityResolver; se puede sobrescribir por entidad con @entityResolver(multi: Boolean)
 #     entity_resolver_multi: false
 
-# Where should any generated models go?
+# ¿Dónde se generan los modelos?
 model:
   filename: graph/model/models_gen.go
   package: model
 
-  # Optional: Pass in a path to a new gotpl template to use for generating the models
+  # Opcional: ruta a una plantilla gotpl propia para generar los modelos
   # model_template: [your/path/model.gotpl]
 
-# Where should the resolver implementations go?
+# ¿Dónde van las implementaciones de los resolvers?
 resolver:
   package: graph
-  layout: follow-schema # Only other option is "single-file."
+  layout: follow-schema # La otra opción es "single-file".
 
-  # Only for single-file layout:
+  # Solo para el layout single-file:
   # filename: graph/resolver.go
 
-  # Only for follow-schema layout:
+  # Solo para el layout follow-schema:
   dir: graph
   filename_template: "{name}.resolvers.go"
 
-  # Optional: turn on to not generate template comments above resolvers
+  # Opcional: actívalo para no generar los comentarios de plantilla encima de los resolvers
   # omit_template_comment: false
-  # Optional: Pass in a path to a new gotpl template to use for generating resolvers
+  # Opcional: ruta a una plantilla gotpl propia para generar los resolvers
   # resolver_template: [your/path/resolver.gotpl]
-  # Optional: turn on to avoid rewriting existing resolver(s) when generating
+  # Opcional: actívalo para no reescribir los resolvers existentes al generar
   # preserve_resolver: false
-  # Optional: turn on to hold the root resolver in a named "r" field instead of embedding it.
-  # Speeds up compilation on large schemas. Turning this on is source-breaking for existing
-  # resolver bodies: dependencies are reached as r.r.myService instead of r.myService.
+  # Opcional: actívalo para guardar el resolver raíz en un campo "r" en lugar de embeberlo.
+  # Acelera la compilación en esquemas grandes. Rompe el código de los resolvers existentes:
+  # a las dependencias se accede como r.r.myService en lugar de r.myService.
   # omit_resolver_embedding: false
-  # Optional: the name of the resolver struct type (default: Resolver)
+  # Opcional: nombre del struct del resolver (por defecto: Resolver)
   # type: Resolver
 
-# Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
+# Opcional: actívalo para usar etiquetas ` + "`" + `gqlgen:"fieldName"` + "`" + ` en tus modelos
 # struct_tag: json
 
-# Optional: prefix for embedded structs (default: "Base")
+# Opcional: prefijo para los structs embebidos (por defecto: "Base")
 # embedded_structs_prefix: Base
 
-# Optional: custom directive configuration
+# Opcional: configuración de directivas propias
 # directives:
 #   hasRole:
 #     skip_runtime: false
 
-# Optional: local package prefix for import sorting
+# Opcional: prefijo de paquetes locales para ordenar los imports
 # local_prefix: ""
 
-# Optional: turn on to use []Thing instead of []*Thing
+# Opcional: actívalo para usar []Thing en lugar de []*Thing
 # omit_slice_element_pointers: false
 
-# Optional: turn on to omit getter methods on models
+# Opcional: actívalo para omitir los métodos getter en los modelos
 # omit_getters: false
 
-# Optional: turn on to omit Is<Name>() methods to interface and unions
+# Opcional: actívalo para omitir los métodos Is<Name>() en interfaces y uniones
 # omit_interface_checks: true
 
-# Optional: turn on to skip generation of ComplexityRoot struct content and Complexity function
+# Opcional: actívalo para no generar el contenido del struct ComplexityRoot ni la función Complexity
 # omit_complexity: false
 
-# Optional: turn on to not generate any file notice comments in generated files
+# Opcional: actívalo para no generar el aviso de archivo generado en los archivos generados
 # omit_gqlgen_file_notice: false
 
-# Optional: turn on to exclude the gqlgen version in the generated file notice. No effect if `omit_gqlgen_file_notice` is true.
+# Opcional: actívalo para quitar la versión de gqlgen del aviso de archivo generado. No tiene efecto si `omit_gqlgen_file_notice` es true.
 # omit_gqlgen_version_in_file_notice: false
 
-# Optional: turn on to exclude root models such as Query and Mutation from the generated models file.
+# Opcional: actívalo para excluir los modelos raíz, como Query y Mutation, del archivo de modelos generado.
 # omit_root_models: false
 
-# Optional: turn on to exclude resolver fields from the generated models file.
+# Opcional: actívalo para excluir los campos con resolver del archivo de modelos generado.
 # omit_resolver_fields: false
 
-# Optional: turn on to omit panic handler in the generated server
+# Opcional: actívalo para omitir el manejador de panics en el servidor generado
 # omit_panic_handler: false
 
-# Optional: turn on to omit JSON marshaler/unmarshaler generation for enums
+# Opcional: actívalo para no generar el marshaler/unmarshaler JSON de los enums
 # omit_enum_json_marshalers: false
 
-# Optional: turn off to make struct-type struct fields not use pointers
-# e.g. type Thing struct { FieldA OtherThing } instead of { FieldA *OtherThing }
+# Opcional: desactívalo para que los campos de tipo struct no usen punteros,
+# p. ej. type Thing struct { FieldA OtherThing } en lugar de { FieldA *OtherThing }
 # struct_fields_always_pointers: true
 
-# Optional: turn off to make resolvers return values instead of pointers for structs
+# Opcional: desactívalo para que los resolvers devuelvan valores en lugar de punteros a structs
 # resolvers_always_return_pointers: true
 
-# Optional: turn on to return pointers instead of values in unmarshalInput
+# Opcional: actívalo para devolver punteros en lugar de valores en unmarshalInput
 # return_pointers_in_unmarshalinput: false
 
-# Optional: wrap nullable input fields with Omittable
+# Opcional: envuelve los campos de entrada anulables con Omittable
 # nullable_input_omittable: true
 
-# Optional: enable adding omitempty to the json tag of generated model fields
+# Opcional: añade omitempty a la etiqueta json de los campos de los modelos generados
 # enable_model_json_omitempty_tag: false
 
-# Optional: enable adding omitzero to the json tag of generated model fields
+# Opcional: añade omitzero a la etiqueta json de los campos de los modelos generados
 # enable_model_json_omitzero_tag: false
 
-# Optional: set to speed up generation time by not performing a final validation pass.
+# Opcional: acelera la generación omitiendo la pasada final de validación.
 # skip_validation: true
 
-# Optional: set to skip running `go mod tidy` when generating server code
+# Opcional: evita ejecutar `go mod tidy` al generar el código del servidor
 # skip_mod_tidy: true
 
-# Optional: if this is set to true, argument directives that
-# decorate a field with a null value will still be called.
+# Opcional: si es true, las directivas de argumento que decoran
+# un campo con valor null se siguen llamando.
 #
-# This enables argumment directives to not just mutate
-# argument values but to set them even if they're null.
+# Así las directivas de argumento no solo pueden modificar
+# los valores de los argumentos, sino también asignarlos aunque sean null.
 call_argument_directives_with_null: true
 
-# This enables gql server to use function syntax for execution context
-# instead of generating receiver methods of the execution context.
+# Hace que el servidor gql use sintaxis de funciones para el contexto de ejecución
+# en lugar de generar métodos con receptor sobre él.
 # use_function_syntax_for_execution_context: false
 
-# Optional: set build tags that will be used to load packages
+# Opcional: build tags que se usarán para cargar los paquetes
 # go_build_tags:
 #  - private
 #  - enterprise
 
-# Optional: set to modify the initialisms regarded for Go names
+# Opcional: modifica las siglas que se tienen en cuenta en los nombres de Go
 # go_initialisms:
-#   replace_defaults: false # if true, the default initialisms will get dropped in favor of the new ones instead of being added
-#   initialisms: # List of initialisms to for Go names
+#   replace_defaults: false # si es true, las siglas por defecto se sustituyen por las nuevas en lugar de añadirse
+#   initialisms: # Lista de siglas para los nombres de Go
 #     - 'CC'
 #     - 'BCC'
 
-# Optional: enable getter/haser methods for autobind
+# Opcional: activa los métodos getter/haser para autobind
 # autobind_getter_haser: false
 
-# gqlgen will search for any type names in the schema in these go packages
-# if they match it will use them, otherwise it will generate them.
+# gqlgen busca los nombres de tipo del esquema en estos paquetes de Go:
+# si coinciden los usa y, si no, los genera.
 autobind:
 #  - "github.com/cristianrisueo/graph-bookstore-api/graph/model"
 
-# This section declares type mapping between the GraphQL and go type systems
+# Esta sección declara la correspondencia entre los tipos de GraphQL y los de Go.
 #
-# The first line in each type will be used as defaults for resolver arguments and
-# modelgen, the others will be allowed when binding to fields. Configure them to
-# your liking
+# La primera línea de cada tipo se usa por defecto para los argumentos de los resolvers
+# y para modelgen; las demás se permiten al enlazar campos. Configúralos
+# a tu gusto.
 models:
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.IntID
-  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid 
-  # but you can override this to provide your own GraphQL UUID implementation
+  # gqlgen incluye un envoltorio UUID para GraphQL basado en github.com/google/uuid,
+  # pero puedes sustituirlo por tu propia implementación.
   UUID:
     model:
       - github.com/99designs/gqlgen/graphql.UUID
 
-  # The GraphQL spec explicitly states that the Int type is a signed 32-bit
-  # integer. Using Go int or int64 to represent it can lead to unexpected
-  # behavior, and some GraphQL tools like Apollo Router will fail when
-  # communicating numbers that overflow 32-bits.
+  # La especificación de GraphQL dice explícitamente que Int es un entero con
+  # signo de 32 bits. Representarlo con int o int64 de Go puede dar comportamientos
+  # inesperados, y algunas herramientas de GraphQL, como Apollo Router, fallan al
+  # recibir números que superan los 32 bits.
   #
-  # You may choose to use the custom, built-in Int64 scalar to represent 64-bit
-  # integers, or ignore the spec and bind Int to graphql.Int / graphql.Int64
-  # (the default behavior of gqlgen). This is fine in simple use cases when you
-  # do not need to worry about interoperability and only expect small numbers.
+  # Puedes usar el escalar Int64 que trae gqlgen para enteros de 64 bits, o ignorar
+  # la especificación y enlazar Int a graphql.Int / graphql.Int64 (el comportamiento
+  # por defecto de gqlgen). Esto vale en casos sencillos en los que no importa la
+  # interoperabilidad y solo se esperan números pequeños.
   # Mapeado a graphql.Int (Go int) para que Book.Year int enlace con Int.
   Int:
     model:

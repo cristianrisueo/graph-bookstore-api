@@ -20,14 +20,14 @@ import (
 )
 
 func main() {
-	// Structured logger writing to stdout.
+	// Logger estructurado que escribe en stdout.
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// Configuration from environment variables with defaults.
+	// Configuración desde variables de entorno con valores por defecto.
 	port := getenv("PORT", "8080")
 	dsn := getenv("DB_DSN", "postgres://bookstore:bookstore@localhost:5432/bookstore?sslmode=disable")
 
-	// Connect to the database.
+	// Conexión a la base de datos.
 	st, err := store.New(dsn)
 	if err != nil {
 		logger.Error("connect to database", "err", err)
@@ -35,13 +35,13 @@ func main() {
 	}
 	defer st.Close()
 
-	// GraphQL server with POST and GET transports and introspection.
+	// Servidor GraphQL con transportes POST y GET e introspección.
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Store: st}}))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.GET{})
 	srv.Use(extension.Introspection{})
 
-	// Routes: GraphQL endpoint, playground and health check.
+	// Rutas: endpoint GraphQL, playground y health check.
 	mux := http.NewServeMux()
 	mux.Handle("/query", srv)
 	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
@@ -53,7 +53,7 @@ func main() {
 		w.Write([]byte("ok"))
 	})
 
-	// HTTP server started in the background.
+	// Servidor HTTP arrancado en segundo plano.
 	httpSrv := &http.Server{
 		Addr:              ":" + port,
 		Handler:           mux,
@@ -67,7 +67,7 @@ func main() {
 		}
 	}()
 
-	// Graceful shutdown on SIGINT/SIGTERM.
+	// Apagado ordenado con SIGINT/SIGTERM.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	<-ctx.Done()
@@ -80,7 +80,7 @@ func main() {
 	}
 }
 
-// getenv returns the value of key or fallback when it is empty.
+// getenv devuelve el valor de key o fallback si está vacío.
 func getenv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v

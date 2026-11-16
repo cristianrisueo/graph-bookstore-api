@@ -6,30 +6,30 @@ import (
 	"fmt"
 	"time"
 
-	// Registers the "pgx" driver for database/sql.
+	// Registra el driver "pgx" para database/sql.
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// Store wraps the database connection pool.
+// Store encapsula el pool de conexiones a la base de datos.
 type Store struct {
 	db *sql.DB
 }
 
-// New opens a connection pool to PostgreSQL and verifies it with a ping.
+// New abre un pool de conexiones a PostgreSQL y lo verifica con un ping.
 func New(dsn string) (*Store, error) {
-	// Open the pool (no connection is made yet).
+	// Abre el pool (todavía no se establece ninguna conexión).
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)
 	}
 
-	// Configure the connection pool.
+	// Configura el pool de conexiones.
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(30 * time.Minute)
 	db.SetConnMaxIdleTime(5 * time.Minute)
 
-	// Make sure the database is reachable.
+	// Comprueba que la base de datos es accesible.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
@@ -40,12 +40,12 @@ func New(dsn string) (*Store, error) {
 	return &Store{db: db}, nil
 }
 
-// Ping checks that the database is still reachable.
+// Ping comprueba que la base de datos sigue siendo accesible.
 func (s *Store) Ping(ctx context.Context) error {
 	return s.db.PingContext(ctx)
 }
 
-// Close closes the connection pool.
+// Close cierra el pool de conexiones.
 func (s *Store) Close() error {
 	return s.db.Close()
 }

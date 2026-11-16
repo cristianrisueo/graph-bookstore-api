@@ -2,7 +2,7 @@ package store
 
 import "errors"
 
-// Book is the domain model for a book. Its author is resolved from AuthorID.
+// Book es el modelo de dominio de un libro. Su autor se resuelve a partir de AuthorID.
 type Book struct {
 	ID       int
 	Title    string
@@ -10,5 +10,5 @@ type Book struct {
 	AuthorID int
 }
 
-// ErrBookNotFound is returned when no book exists with the given ID.
+// ErrBookNotFound se devuelve cuando no existe ningún libro con el ID indicado.
 var ErrBookNotFound = errors.New("book not found")
