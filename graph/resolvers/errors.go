@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	"github.com/cristianrisueo/graph-bookstore-api/store"
@@ -22,104 +21,70 @@ const (
 	codeInternalServerError = "INTERNAL_SERVER_ERROR"
 )
 
-// validationError es un error de validación de entrada ligado a un campo
-// concreto. Los resolvers lo crean con inputError; el presenter se encarga
-// de traducirlo a BAD_USER_INPUT con extensions.field.
-type validationError struct {
-	field   string
-	message string
-}
+// errInternal es el error que devuelve NewRecoverFunc tras registrar un panic.
+var errInternal = errors.New("internal server error")
 
-func (e *validationError) Error() string { return e.message }
-
-// inputError crea un error de validación para que los resolvers lo
-// devuelvan cuando el valor de un campo de entrada no es válido.
+// inputError crea un error de validación ligado a un campo de entrada.
 func inputError(field, msg string) error {
-	return &validationError{field: field, message: msg}
+	return &gqlerror.Error{
+		Message:    msg,
+		Extensions: map[string]any{"code": codeBadUserInput, "field": field},
+	}
 }
 
-// NewErrorPresenter clasifica los errores que llegan al cliente GraphQL y
-// les asigna un código en extensions.code, sin filtrar detalles internos.
+// NewErrorPresenter asigna extensions.code a cada error y oculta los detalles internos.
 func NewErrorPresenter(logger *slog.Logger) graphql.ErrorPresenterFunc {
 	return func(ctx context.Context, err error) *gqlerror.Error {
 		gqlErr := graphql.DefaultErrorPresenter(ctx, err)
-		if gqlErr == nil {
-			return nil
-		}
-
-		cause := gqlErr.Err
-		if cause == nil {
-			cause = err
-		}
-
-		var valErr *validationError
 		var numErr *strconv.NumError
 
 		switch {
-		case errors.Is(cause, store.ErrAuthorNotFound), errors.Is(cause, store.ErrBookNotFound):
-			setCode(gqlErr, codeNotFound)
+		// Errores de dominio conocidos.
+		case errors.Is(err, store.ErrAuthorNotFound), errors.Is(err, store.ErrBookNotFound):
+			setExtension(gqlErr, "code", codeNotFound)
+		case errors.Is(err, store.ErrAuthorHasBooks):
+			setExtension(gqlErr, "code", codeAuthorHasBooks)
 
-		case errors.Is(cause, store.ErrAuthorHasBooks):
-			setCode(gqlErr, codeAuthorHasBooks)
+		// Ya traen código: los de inputError y los de parseo/validación de gqlgen.
+		case gqlErr.Extensions["code"] != nil:
 
-		case errors.As(cause, &valErr):
-			gqlErr.Message = valErr.message
-			setCode(gqlErr, codeBadUserInput)
-			setExtension(gqlErr, "field", valErr.field)
+		// ID que no se puede convertir a número (graphql.IntID). Es el único error de
+		// conversión que ocurre al ejecutar; los demás tipos los rechaza la validación.
+		case errors.As(err, &numErr):
+			gqlErr.Message = "invalid ID"
+			setExtension(gqlErr, "code", codeBadUserInput)
 
-		case errors.As(cause, &numErr):
-			// Error de conversión de argumentos generado por gqlgen
-			// (p. ej. id: "abc"), sin detalles de Go para el cliente.
-			gqlErr.Message = "invalid value for argument " + argumentName(gqlErr.Path)
-			setCode(gqlErr, codeBadUserInput)
+		// Panic ya registrado por NewRecoverFunc.
+		case errors.Is(err, errInternal):
+			setExtension(gqlErr, "code", codeInternalServerError)
 
+		// Cualquier otro error: se registra y se oculta al cliente.
 		default:
-			logger.Error("unhandled graphql error", "path", gqlErr.Path.String(), "err", cause)
-			gqlErr.Message = "internal server error"
-			setCode(gqlErr, codeInternalServerError)
+			logger.Error("unhandled graphql error", "path", gqlErr.Path.String(), "err", err)
+			gqlErr.Message = errInternal.Error()
+			setExtension(gqlErr, "code", codeInternalServerError)
 		}
 
 		return gqlErr
 	}
 }
 
-// NewRecoverFunc registra el panic y devuelve un error genérico que el
-// presenter termina mostrando como INTERNAL_SERVER_ERROR.
+// NewRecoverFunc registra el panic con su traza y devuelve errInternal.
 func NewRecoverFunc(logger *slog.Logger) graphql.RecoverFunc {
-	return func(ctx context.Context, err any) error {
+	return func(ctx context.Context, p any) error {
 		logger.Error("panic recovered",
 			"path", graphql.GetPath(ctx).String(),
-			"err", err,
+			"panic", p,
 			"stack", string(debug.Stack()),
 		)
-		return errors.New("internal server error")
+		return errInternal
 	}
 }
 
-// setCode añade o sobrescribe extensions.code en err.
-func setCode(err *gqlerror.Error, code string) {
-	if err.Extensions == nil {
-		err.Extensions = map[string]any{}
-	}
-	err.Extensions["code"] = code
-}
-
-// setExtension añade o sobrescribe una clave de extensions en err.
+// setExtension añade o sobrescribe una clave de extensions.
 func setExtension(err *gqlerror.Error, key string, value any) {
 	if err.Extensions == nil {
 		err.Extensions = map[string]any{}
 	}
 	err.Extensions[key] = value
-}
-
-// argumentName devuelve el nombre del último segmento de path, que es el
-// argumento cuyo valor gqlgen no pudo convertir.
-func argumentName(path ast.Path) string {
-	if len(path) == 0 {
-		return "input"
-	}
-	if name, ok := path[len(path)-1].(ast.PathName); ok {
-		return string(name)
-	}
-	return "input"
 }
