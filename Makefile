@@ -1,4 +1,4 @@
-.PHONY: db-up db-down migrate-up migrate-down seed generate run setup reset
+.PHONY: db-up db-down db-logs migrate-up migrate-down seed generate run setup reset
 
 # Levanta el contenedor de la base de datos en segundo plano
 db-up:
@@ -7,6 +7,10 @@ db-up:
 # Detiene y elimina los contenedores de docker compose
 db-down:
 	docker compose down
+
+# Muestra en vivo los logs de la base de datos
+db-logs:
+	docker compose logs -f db
 
 # Aplica las migraciones a la base de datos
 migrate-up:

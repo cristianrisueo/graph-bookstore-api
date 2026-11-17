@@ -3,6 +3,7 @@ name: graph-bookstore-api
 services:
   db:
     image: postgres:18
+    command: ["postgres", "-c", "log_statement=all"]
     environment:
       POSTGRES_USER: bookstore
       POSTGRES_PASSWORD: bookstore
