@@ -52,6 +52,26 @@ func (s *Store) CreateBook(ctx context.Context, title string, year, authorID int
 }
 
 
+// scanBooks consume rows y construye la lista de libros, cerrándolo siempre.
+func scanBooks(rows *sql.Rows) ([]*Book, error) {
+	defer rows.Close()
+
+	var books []*Book
+	for rows.Next() {
+		var b Book
+		if err := rows.Scan(&b.ID, &b.Title, &b.Year, &b.AuthorID); err != nil {
+			return nil, fmt.Errorf("scan book: %w", err)
+		}
+		books = append(books, &b)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("scan book: %w", err)
+	}
+
+	return books, nil
+}
+
 // ListBooks devuelve todos los libros ordenados por id.
 func (s *Store) ListBooks(ctx context.Context) ([]*Book, error) {
 	// Ejecuta la consulta y obtiene un iterador de filas.
@@ -65,19 +85,8 @@ func (s *Store) ListBooks(ctx context.Context) ([]*Book, error) {
 		return nil, fmt.Errorf("list books: %w", err)
 	}
 
-	defer rows.Close()
-
-	// Itera sobre las filas y construye la lista de libros.
-	var books []*Book
-	for rows.Next() {
-		var b Book
-		if err := rows.Scan(&b.ID, &b.Title, &b.Year, &b.AuthorID); err != nil {
-			return nil, fmt.Errorf("scan book: %w", err)
-		}
-		books = append(books, &b)
-	}
-
-	if err := rows.Err(); err != nil {
+	books, err := scanBooks(rows)
+	if err != nil {
 		return nil, fmt.Errorf("list books: %w", err)
 	}
 
@@ -85,34 +94,24 @@ func (s *Store) ListBooks(ctx context.Context) ([]*Book, error) {
 	return books, nil
 }
 
-// ListBooksByAuthor devuelve los libros del autor indicado, ordenados por id.
-func (s *Store) ListBooksByAuthor(ctx context.Context, authorID int) ([]*Book, error) {
+// ListBooksByAuthorIDs devuelve los libros de los autores indicados, ordenados
+// por author_id y luego por id.
+func (s *Store) ListBooksByAuthorIDs(ctx context.Context, authorIDs []int) ([]*Book, error) {
 	// Ejecuta la consulta y obtiene un iterador de filas.
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT id, title, year, author_id
 		FROM books
-		WHERE author_id = $1
-		ORDER BY id
-	`, authorID)
+		WHERE author_id = ANY($1)
+		ORDER BY author_id, id
+	`, authorIDs)
 
 	if err != nil {
-		return nil, fmt.Errorf("list books by author: %w", err)
+		return nil, fmt.Errorf("list books by author ids: %w", err)
 	}
 
-	defer rows.Close()
-
-	// Itera sobre las filas y construye la lista de libros.
-	var books []*Book
-	for rows.Next() {
-		var b Book
-		if err := rows.Scan(&b.ID, &b.Title, &b.Year, &b.AuthorID); err != nil {
-			return nil, fmt.Errorf("scan book: %w", err)
-		}
-		books = append(books, &b)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("list books by author: %w", err)
+	books, err := scanBooks(rows)
+	if err != nil {
+		return nil, fmt.Errorf("list books by author ids: %w", err)
 	}
 
 	// Devuelve la lista de libros.

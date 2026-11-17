@@ -8,6 +8,7 @@ require (
 	github.com/99designs/gqlgen v0.17.98
 	github.com/jackc/pgx/v5 v5.13.0
 	github.com/vektah/gqlparser/v2 v2.5.64
+	github.com/vikstrous/dataloadgen v0.0.10
 )
 
 require (
@@ -22,6 +23,8 @@ require (
 	github.com/jackc/puddle/v2 v2.2.3 // indirect
 	github.com/sosodev/duration v1.4.0 // indirect
 	github.com/urfave/cli/v3 v3.14.0 // indirect
+	go.opentelemetry.io/otel v1.11.1 // indirect
+	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 	golang.org/x/mod v0.42.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/text v0.43.0 // indirect

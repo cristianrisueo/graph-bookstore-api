@@ -42,7 +42,7 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*store.Author, error) {
 
 // Books is the resolver for the books field.
 func (r *authorResolver) Books(ctx context.Context, obj *store.Author) ([]*store.Book, error) {
-	return r.Store.ListBooksByAuthor(ctx, obj.ID)
+	return loadersFor(ctx).booksByAuthorID.Load(ctx, obj.ID)
 }
 
 // UpdateAuthor is the resolver for the updateAuthor field.

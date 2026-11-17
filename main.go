@@ -46,7 +46,7 @@ func main() {
 
 	// Rutas: endpoint GraphQL, playground y health check.
 	mux := http.NewServeMux()
-	mux.Handle("/query", srv)
+	mux.Handle("/query", resolvers.LoadersMiddleware(st, srv))
 	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		if err := st.Ping(r.Context()); err != nil {
